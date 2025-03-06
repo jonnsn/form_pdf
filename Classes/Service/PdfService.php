@@ -74,7 +74,8 @@ class PdfService
         $this->standaloneView->setFormat('html');
 
         $this->standaloneView->setTemplatePathAndFilename($htmlFile);
-        $this->standaloneView->assignMultiple($values);
+        $this->standaloneView->assignMultiple($values[0]);
+        $this->standaloneView->assign('fields', $values[1]);
         return $this->standaloneView->render();
     }
 }

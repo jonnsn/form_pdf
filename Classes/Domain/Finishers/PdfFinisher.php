@@ -127,20 +127,30 @@ class PdfFinisher extends AbstractFinisher
     private function parseForm(): array
     {
         $formValues = [];
+        $formDetails = [];
         $formDefinition = $this->finisherContext->getFormRuntime()->getFormDefinition();
         if ($formDefinition instanceof FormDefinition) {
             foreach ($this->finisherContext->getFormValues() as $fieldName => $fieldValue) {
                 $fieldElement = $formDefinition->getElementByIdentifier($fieldName);
                 if ($fieldElement instanceof FormElementInterface && $fieldElement->getType() !== 'Honeypot') {
+                    $formDetails[$fieldName] = [
+                        'label' => $fieldElement->getLabel(),
+                        'type' => $fieldElement->getType(),
+                        'identifier' => $fieldElement->getIdentifier(),
+                    ];
+                    if (isset($fieldElement->getProperties()['options'])) {
+                        $formDetails[$fieldName]['options'] = $fieldElement->getProperties()['options'];
+                    }
                     if ($fieldValue instanceof FileReference) {
                         $formValues[$fieldName] = $fieldValue->getOriginalResource()->getCombinedIdentifier();
+                        $formDetails[$fieldName]['value'] = $fieldValue->getOriginalResource()->getCombinedIdentifier();
                     } else {
                         $formValues[$fieldName] = $fieldValue;
+                        $formDetails[$fieldName]['value'] = $fieldValue;
                     }
                 }
             }
         }
-
-        return $formValues;
+        return [$formValues, $formDetails];
     }
 }
